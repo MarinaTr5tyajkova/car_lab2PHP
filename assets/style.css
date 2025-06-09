@@ -9,8 +9,8 @@ body {
 }
 
 .container {
-    width: 90%;
-    max-width: 1200px;
+    width: 95%;
+    /*max-width: 1900зч;*/
     margin: 0 auto;
     padding: 20px 0;
 }

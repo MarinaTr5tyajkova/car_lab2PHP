@@ -1,9 +1,6 @@
 <?php
 /**
  * Получить пользователя по логину
- * @param mysqli $conn
- * @param string $login
- * @return array|null
  */
 function getUserByLogin($conn, $login) {
     $stmt = $conn->prepare("SELECT * FROM users WHERE login = ?");
@@ -12,28 +9,28 @@ function getUserByLogin($conn, $login) {
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
     $stmt->close();
-    return $user ?: null;
+    return $user;
 }
 
 /**
  * Зарегистрировать нового пользователя
- * @param mysqli $conn
- * @param string $login
- * @param string $passwordHash
- * @param string $full_name
- * @param string $email
- * @param string $phone
- * @return int|false ID нового пользователя или false
  */
-function registerUser($conn, $login, $passwordHash, $full_name, $email, $phone) {
-    $stmt = $conn->prepare("INSERT INTO users (login, password, full_name, email, phone, role) VALUES (?, ?, ?, ?, ?, 'user')");
-    $stmt->bind_param("sssss", $login, $passwordHash, $full_name, $email, $phone);
-    $res = $stmt->execute();
-    if ($res) {
-        $id = $stmt->insert_id;
-        $stmt->close();
-        return $id;
+function registerUser($conn, $login, $password, $full_name, $email, $phone, $role = 'user') {
+    $hashed_password = md5($password); // Используем MD5
+    $stmt = $conn->prepare("INSERT INTO users (login, password, full_name, email, created_at, phone, role) VALUES (?, ?, ?, ?, NOW(), ?, ?)");
+    $stmt->bind_param("ssssss", $login, $hashed_password, $full_name, $email, $phone, $role);
+    return $stmt->execute() ? $stmt->insert_id : false;
+}
+
+/**
+ * Создать администратора
+ */
+function createAdminAccount($conn) {
+    $check = $conn->query("SELECT id FROM users WHERE login = 'admin' LIMIT 1");
+    if ($check->num_rows === 0) {
+        $password = 'admin123'; // Пароль по умолчанию
+        $hashed_password = md5($password);
+        $conn->query("INSERT INTO users (login, password, full_name, email, phone, role, created_at) 
+                      VALUES ('admin', '$hashed_password', 'Администратор', 'admin@example.com', '+123456789', 'admin', NOW())");
     }
-    $stmt->close();
-    return false;
 }
