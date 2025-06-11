@@ -18,10 +18,14 @@ if (!$car) {
     exit();
 }
 
-$user_has_reservation = false;
+// Инициализируем массив бронирований пользователя, чтобы избежать ошибки в шаблоне
+$user_reservations = [];
 if (isset($_SESSION['user_id'])) {
-    $user_has_reservation = userHasActiveReservation($conn, $_SESSION['user_id'], $car_id);
+    $user_reservations = getUserActiveReservations($conn, $_SESSION['user_id']);
 }
+
+// Вычисляем, есть ли активный резерв на данный автомобиль у пользователя
+$user_has_reservation = in_array($car['id'], $user_reservations);
 
 include 'includes/header.php';
 include 'templates/car_details.php';

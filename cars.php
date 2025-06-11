@@ -13,6 +13,6 @@ if (isset($_SESSION['user_id'])) {
     $user_reservations = getUserActiveReservations($conn, $_SESSION['user_id']);
 }
 
-include 'templates/header.php';
+include 'includes/header.php';
 include 'templates/cars.php';
 include 'templates/footer.php';

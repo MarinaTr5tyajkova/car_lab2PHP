@@ -41,7 +41,7 @@
                 <input type="tel" id="phone" name="phone" required value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
             </div>
 
-            <button type="submit" class="btn">Зарегистрироваться</button>
+            <button type="submit" class="btn-log">Зарегистрироваться</button>
 
             <div class="link-text">
                 Уже есть аккаунт? <a href="login.php">Войдите</a>
