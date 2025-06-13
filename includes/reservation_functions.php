@@ -47,7 +47,7 @@ function createReservation($conn, $user_id, $car_id) {
     $conn->begin_transaction();
 
     try {
-        // Обновляем статус автомобиля на reserved, если он доступен
+        // Обновляем статус автомобиля
         $stmt = $conn->prepare("UPDATE cars SET status = 'reserved' WHERE id = ? AND status = 'available'");
         $stmt->bind_param("i", $car_id);
         $stmt->execute();
@@ -57,8 +57,11 @@ function createReservation($conn, $user_id, $car_id) {
         $stmt->close();
 
         $expiration_date = date('Y-m-d H:i:s', strtotime('+3 days'));
-        $stmt = $conn->prepare("INSERT INTO reservations (car_id, user_id, expiration_date, payment_status, date) VALUES (?, ?, ?, 'pending', NOW())");
-        $stmt->bind_param("iis", $car_id, $user_id, $expiration_date);
+        $reservation_date = date('Y-m-d H:i:s'); // Текущая дата и время
+
+        // Используем правильные имена колонок из вашей БД
+        $stmt = $conn->prepare("INSERT INTO reservations (car_id, user_id, reservation_date, expiration_date, payment_status) VALUES (?, ?, ?, ?, 'pending')");
+        $stmt->bind_param("iiss", $car_id, $user_id, $reservation_date, $expiration_date);
         $stmt->execute();
 
         $reservation_id = $stmt->insert_id;

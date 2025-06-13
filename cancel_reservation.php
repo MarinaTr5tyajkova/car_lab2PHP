@@ -13,7 +13,7 @@ if (!isset($_GET['car_id']) || !is_numeric($_GET['car_id'])) {
 }
 
 $car_id = (int)$_GET['car_id'];
-$user_id = (int)$_SESSION['user_id'];
+$user_id = (int)$_SESSION['user_id'];пш
 
 try {
     cancelReservation($conn, $user_id, $car_id);

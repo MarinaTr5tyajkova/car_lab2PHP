@@ -8,7 +8,9 @@ checkAuth();
 
 $user_id = $_SESSION['user_id'];
 
-$sql = "SELECT r.*, c.brand, c.model, c.id as car_id FROM reservations r 
+$sql = "SELECT r.*, c.brand, c.model, c.id as car_id, 
+               r.reservation_date as date  /* используем reservation_date как date */
+        FROM reservations r 
         JOIN cars c ON r.car_id = c.id 
         WHERE r.user_id = ?";
 $stmt = $conn->prepare($sql);

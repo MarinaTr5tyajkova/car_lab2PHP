@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 function checkAuth($roles = []) {
-    if (!isset($_SESSION['user_id'])) {  // Здесь была пропущена закрывающая скобка
+    if (!isset($_SESSION['user_id'])) {
         header('Location: /templates/login.php');
         exit();
     }
@@ -20,3 +20,8 @@ function isAdmin() {
 function isEmployee() {
     return ($_SESSION['role'] ?? '') === 'employee';
 }
+
+function isUser() {
+    return isset($_SESSION['role']) && $_SESSION['role'] === 'user';
+}
+?>
