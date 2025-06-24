@@ -1,14 +1,7 @@
 <div class="container">
-    <h2>Панель работника</h2>
-
-    <div class="employee-sections">
         <!-- Форма добавления автомобиля -->
         <section class="add-car-form">
             <h3>Добавить новый автомобиль</h3>
-            <?php if (isset($_GET['success'])): ?>
-                <div class="alert alert-success">Автомобиль успешно добавлен!</div>
-            <?php endif; ?>
-
             <form method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>Марка:</label>
@@ -82,9 +75,19 @@
                     </thead>
                     <tbody>
                     <?php foreach ($cars as $car): ?>
+                        <?php
+                        $img_path = $car['image_path'] ?? '';
+                        if (!$img_path || !file_exists($img_path)) {
+                            $img_path = 'uploads/cars/default.png';
+                        }
+                        ?>
                         <tr>
                             <td><?= $car['id'] ?></td>
-                            <td><?= htmlspecialchars($car['brand']) ?></td>
+                            <td>
+                                <img src="<?= htmlspecialchars($img_path) ?>" alt="Фото <?= htmlspecialchars($car['brand'] . ' ' . $car['model']) ?>" style="max-width: 100px; max-height: 60px;">
+                                <br>
+                                <?= htmlspecialchars($car['brand']) ?>
+                            </td>
                             <td><?= htmlspecialchars($car['model']) ?></td>
                             <td><?= $car['production_year'] ?></td>
                             <td><?= number_format($car['price'], 0, '', ' ') ?> ₽</td>
@@ -107,5 +110,4 @@
         </section>
     </div>
 </div>
-
 

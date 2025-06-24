@@ -91,6 +91,3 @@ include 'includes/header.php';
 
 <p><a href="admin_panel.php">← Вернуться в панель администратора</a></p>
 
-<?php
-include 'includes/footer.php';
-?>

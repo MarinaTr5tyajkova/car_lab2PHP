@@ -39,4 +39,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include 'includes/header.php';
 include 'templates/register.php';
-include 'templates/footer.php';
+

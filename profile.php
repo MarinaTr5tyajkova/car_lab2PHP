@@ -88,5 +88,4 @@ if (isset($_SESSION['success_message'])) {
 
 include 'includes/header.php';
 include 'templates/profile.php';
-include 'templates/footer.php';
 ?>

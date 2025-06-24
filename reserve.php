@@ -7,18 +7,24 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 
 checkAuth();
 
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    header("Location: index.php?error=Автомобиль не выбран");
+if (!isset($_GET['car_id']) || !is_numeric($_GET['car_id'])) {
+    // Неверный запрос — редиректим на список с ошибкой
+    header("Location: index.php.php?error=1");
     exit();
 }
 
-$car_id = (int)$_GET['id'];
-$user_id = (int)$_SESSION['user_id'];
+$car_id = (int)$_GET['car_id'];
+$user_id = $_SESSION['user_id'];
 
 try {
     $reservation_id = createReservation($conn, $user_id, $car_id);
-    header("Location: payment.php?reservation_id=$reservation_id");
+
+    // После успешной резервации делаем редирект на страницу со списком автомобилей и сообщением об успехе
+    header("Location: index.php?success=1&car_id=$car_id");
     exit();
+
 } catch (Exception $e) {
-    die("Ошибка: " . htmlspecialchars($e->getMessage()));
+    // При ошибке редиректим с параметром ошибки и сообщением (можно расширить)
+    header("Location: index.php?error=1&message=" . urlencode($e->getMessage()));
+    exit();
 }

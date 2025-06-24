@@ -29,4 +29,4 @@ $user_has_reservation = in_array($car['id'], $user_reservations);
 
 include 'includes/header.php';
 include 'templates/car_details.php';
-include 'templates/footer.php';
+

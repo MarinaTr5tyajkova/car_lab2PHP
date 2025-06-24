@@ -22,4 +22,3 @@ $stmt->close();
 
 include 'includes/header.php';
 include 'templates/my_reservations.php';
-include 'templates/footer.php';

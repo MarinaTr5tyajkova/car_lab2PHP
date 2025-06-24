@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars(defined('SITE_NAME') ? SITE_NAME : 'Автомагазин') ?></title>
-    <link rel="stylesheet" href="/car_dealership/assets/style.css?v=0.0.22">
+    <link rel="stylesheet" href="/car_dealership/assets/style.css?v=0.0.26">
 </head>
 <body>
 <header>
@@ -35,7 +35,6 @@
                     <a href="/car_dealership/register.php">Регистрация</a>
                 <?php endif; ?>
             </div>
-
         </nav>
     </div>
 </header>

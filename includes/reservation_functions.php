@@ -1,10 +1,5 @@
 <?php
-/**
- * Получить активные резервации пользователя (payment_status = 'pending')
- * @param mysqli $conn
- * @param int $user_id
- * @return array массив car_id
- */
+
 function getUserActiveReservations($conn, $user_id) {
     $user_id = (int)$user_id;
     $sql = "SELECT car_id FROM reservations WHERE user_id = $user_id AND payment_status = 'pending'";
@@ -18,36 +13,12 @@ function getUserActiveReservations($conn, $user_id) {
     return $reservations;
 }
 
-/**
- * Проверить, есть ли у пользователя активная резервация на конкретный автомобиль
- * @param mysqli $conn
- * @param int $user_id
- * @param int $car_id
- * @return bool
- */
-function userHasActiveReservation($conn, $user_id, $car_id) {
-    $stmt = $conn->prepare("SELECT id FROM reservations WHERE user_id = ? AND car_id = ? AND payment_status = 'pending'");
-    $stmt->bind_param("ii", $user_id, $car_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $has_reservation = $result->num_rows > 0;
-    $stmt->close();
-    return $has_reservation;
-}
 
-/**
- * Создать резервацию автомобиля
- * @param mysqli $conn
- * @param int $user_id
- * @param int $car_id
- * @return int|false возвращает ID резервации или false при ошибке
- * @throws Exception при ошибках транзакции
- */
-function createReservation($conn, $user_id, $car_id) {
+function createReservation($conn, $user_id, $car_id, $client_full_name = null, $client_passport = null, $client_phone = null) {
     $conn->begin_transaction();
 
     try {
-        // Обновляем статус автомобиля
+        // Обновляем статус автомобиля на 'reserved', если он доступен
         $stmt = $conn->prepare("UPDATE cars SET status = 'reserved' WHERE id = ? AND status = 'available'");
         $stmt->bind_param("i", $car_id);
         $stmt->execute();
@@ -56,12 +27,11 @@ function createReservation($conn, $user_id, $car_id) {
         }
         $stmt->close();
 
+        $reservation_date = date('Y-m-d H:i:s');
         $expiration_date = date('Y-m-d H:i:s', strtotime('+3 days'));
-        $reservation_date = date('Y-m-d H:i:s'); // Текущая дата и время
 
-        // Используем правильные имена колонок из вашей БД
-        $stmt = $conn->prepare("INSERT INTO reservations (car_id, user_id, reservation_date, expiration_date, payment_status) VALUES (?, ?, ?, ?, 'pending')");
-        $stmt->bind_param("iiss", $car_id, $user_id, $reservation_date, $expiration_date);
+        $stmt = $conn->prepare("INSERT INTO reservations (car_id, user_id, reservation_date, expiration_date, payment_status, client_full_name, client_passport, client_phone) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?)");
+        $stmt->bind_param("iisssss", $car_id, $user_id, $reservation_date, $expiration_date, $client_full_name, $client_passport, $client_phone);
         $stmt->execute();
 
         $reservation_id = $stmt->insert_id;
@@ -76,19 +46,11 @@ function createReservation($conn, $user_id, $car_id) {
     }
 }
 
-/**
- * Отменить резервацию пользователя на автомобиль
- * @param mysqli $conn
- * @param int $user_id
- * @param int $car_id
- * @return bool
- * @throws Exception
- */
 function cancelReservation($conn, $user_id, $car_id) {
     $conn->begin_transaction();
 
     try {
-        // Получаем ID резервации
+        // Получаем ID активной резервации
         $stmt = $conn->prepare("SELECT id FROM reservations WHERE user_id = ? AND car_id = ? AND payment_status = 'pending'");
         $stmt->bind_param("ii", $user_id, $car_id);
         $stmt->execute();
@@ -106,7 +68,7 @@ function cancelReservation($conn, $user_id, $car_id) {
         $stmt->execute();
         $stmt->close();
 
-        // Обновляем статус автомобиля на available
+        // Обновляем статус автомобиля на 'available'
         $stmt = $conn->prepare("UPDATE cars SET status = 'available' WHERE id = ?");
         $stmt->bind_param("i", $car_id);
         $stmt->execute();

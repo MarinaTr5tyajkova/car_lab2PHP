@@ -20,7 +20,6 @@
                 <td><?= htmlspecialchars($res['payment_status']) ?></td>
                 <td>
                     <?php if ($res['payment_status'] === 'pending'): ?>
-                        <a href="payment.php?reservation_id=<?= $res['id'] ?>" class="btn">Оплатить</a>
                         <a href="cancel_reservation.php?car_id=<?= $res['car_id'] ?>" class="btn btn-danger"
                            onclick="return confirm('Отменить резервацию?')">Отменить</a>
                     <?php else: ?>

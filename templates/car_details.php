@@ -73,3 +73,140 @@
         </div>
     </div>
 </div>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Обработка резервации
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-reserve')) {
+                const button = e.target;
+                const carId = button.dataset.carId;
+                const carCard = button.closest('.car-card');
+
+                fetch(`reserve.php?car_id=${carId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Обновляем карточку
+                            carCard.classList.add('reserved');
+                            button.remove();
+
+                            const badge = document.createElement('div');
+                            badge.className = 'reserved-badge';
+                            badge.textContent = 'Зарезервирован';
+                            carCard.querySelector('.car-image').appendChild(badge);
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        alert('Ошибка соединения');
+                    });
+            }
+        });
+    });
+
+        // Функция для показа модального окна
+        function showModal(title, message) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>${title}</h3>
+                    <button class="modal-close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>${message}</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn modal-close-btn">OK</button>
+                </div>
+            </div>
+        `;
+
+            document.body.appendChild(modal);
+
+            // Закрытие модального окна
+            const closeBtns = modal.querySelectorAll('.modal-close-btn');
+            closeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.body.removeChild(modal);
+                });
+            });
+        }
+
+        // Функция для обновления статуса резервации
+        function updateReservationStatus(isReserved) {
+            const reserveBtn = document.querySelector('.btn-reserve');
+            const cancelBtn = document.querySelector('.btn-cancel');
+            const statusMsg = document.querySelector('.status-message');
+
+            if (isReserved) {
+                if (reserveBtn) reserveBtn.style.display = 'none';
+                if (cancelBtn) cancelBtn.style.display = 'block';
+                if (statusMsg) statusMsg.textContent = 'Вы успешно забронировали этот автомобиль';
+            }
+        }
+    });
+</script>
+
+<style>.modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background-color: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        animation: modalFadeIn 0.3s ease;
+    }
+
+    .modal-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        color: #333;
+    }
+
+    .modal-close-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .modal-footer {
+        padding: 15px 20px;
+        border-top: 1px solid #eee;
+        text-align: right;
+    }
+
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }</style>
